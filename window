@@ -1,5 +1,45 @@
-// A source images is provided with the name 'iImage1'.
-// Its size is available in iImageResolution.
+float HALF_PI = 1.5707963267948966192313216916398;
+float PI = 3.1415926535897932384626433832795;
+float TWO_PI = 6.2831853071795864769252867665590;
+float TAU = 6.2831853071795864769252867665590;
+
+float elasticInOut(in float t) {
+    return t < 0.5
+        ? 0.5 * sin(+13.0 * HALF_PI * 2.0 * t) * pow(2.0, 10.0 * (2.0 * t - 1.0))
+        : 0.5 * sin(-13.0 * HALF_PI * ((2.0 * t - 1.0) + 1.0)) * pow(2.0, -10.0 * (2.0 * t - 1.0)) + 1.0;
+}
+
+
+float cubicOut(in float t) {
+    float f = t - 1.0;
+    return f * f * f + 1.0;
+}
+
+float bounceOut(in float t) {
+    const float a = 4.0 / 11.0;
+    const float b = 8.0 / 11.0;
+    const float c = 9.0 / 10.0;
+
+    const float ca = 4356.0 / 361.0;
+    const float cb = 35442.0 / 1805.0;
+    const float cc = 16061.0 / 1805.0;
+
+    float t2 = t * t;
+
+    return t < a
+        ? 7.5625 * t2
+        : t < b
+            ? 9.075 * t2 - 9.9 * t + 3.4
+            : t < c
+                ? ca * t2 - cb * t + cc
+                : 10.8 * t * t - 20.52 * t + 10.72;
+}
+
+float bounceInOut(in float t) {
+    return t < 0.5
+        ? 0.5 * (1.0 - bounceOut(1.0 - t * 2.0))
+        : 0.5 * bounceOut(t * 2.0 - 1.0) + 0.5;
+}
 
 float sdBox( in float2 p, in float2 b )
 {
@@ -18,7 +58,7 @@ half4 main(float2 coord) {
   
   float2 r = float2(1.,0.01);
   float d = sdBox(uv, r);
-  float t = iTime;
+  float t = cubicOut(iTime);
   
   if( d > t){
 	return half4(0.0,0.0,0.0,0.0);     
