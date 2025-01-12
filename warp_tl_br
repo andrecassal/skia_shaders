@@ -1,0 +1,40 @@
+#version 300 es
+
+precision highp float;
+precision highp sampler2D;
+
+in vec2 uv;
+out vec4 out_color;
+
+uniform vec2 u_resolution;
+uniform float u_time;
+uniform vec4 u_mouse;
+uniform sampler2D u_textures[16];
+
+#include <lygia/space/ratio>
+#include <lygia/math/decimate>
+#include <lygia/draw/circle>
+#include <lygia/animation/easing/cubicInOut>
+
+vec2 mirrored(vec2 v) {
+	vec2 m = mod(v,2.);
+	return mix(m,2.0 - m, step(1.0 ,m));
+}
+
+void main(void) {
+    float progress = cubicInOut(min(u_time / 2., 1.0));
+
+    vec2 pixel = 1.0/u_resolution.xy;
+    vec2 st = gl_FragCoord.xy * pixel;
+    st = ratio(uv, u_resolution.xy);
+   
+    st.y = 1. - st.y;
+
+    float t = smoothstep(progress, progress+.2, (st.x+st.y)/2.0);    
+
+    out_color = mix(
+        texture(u_textures[0],vec2(uv.x, uv.y + t)),
+        texture(u_textures[1],vec2(uv.x, uv.y + (1. - t))),
+        t
+    );
+}
