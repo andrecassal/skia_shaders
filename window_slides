@@ -1,0 +1,36 @@
+#version 300 es
+
+precision highp float;
+precision highp sampler2D;
+
+in vec2 uv;
+out vec4 out_color;
+
+
+
+uniform vec2 u_resolution;
+uniform float u_time;
+uniform vec4 u_mouse;
+uniform sampler2D u_textures[16];
+
+vec4 getFromColor(vec2 uv){
+    return texture(u_textures[0], uv);
+}
+vec4 getToColor(vec2 uv){
+    return texture(u_textures[1], uv);
+}
+
+
+
+void main(){
+
+    float count = 10.0;
+    float smoothness = 0.9;
+    float progress = sin( u_time/.2 );
+    
+    float pr = smoothstep(-smoothness, 0.0, uv.x - progress * (1.0 + smoothness));
+    float s = step(pr, fract(count * uv.x));
+
+
+    out_color = mix(getFromColor(uv), getToColor(uv), s);
+}
